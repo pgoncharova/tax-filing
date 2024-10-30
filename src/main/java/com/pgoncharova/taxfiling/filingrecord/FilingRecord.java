@@ -1,6 +1,6 @@
 package com.pgoncharova.taxfiling.filingrecord;
 
-import com.pgoncharova.taxfiling.user.User;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class FilingRecord {
     private Double taxOwedOrRefund;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "taxpayer_id")
+    private Taxpayer taxpayer;
 
 }

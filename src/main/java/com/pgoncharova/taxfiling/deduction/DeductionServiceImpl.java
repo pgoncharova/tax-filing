@@ -1,6 +1,6 @@
 package com.pgoncharova.taxfiling.deduction;
 
-import com.pgoncharova.taxfiling.user.User;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +22,8 @@ public class DeductionServiceImpl implements DeductionService {
     }
 
     @Override
-    public List<Deduction> findDeductionByUser(User user) {
-        return deductionRepository.findByUser(user);
+    public List<Deduction> findDeductionByTaxpayer(Taxpayer taxpayer) {
+        return deductionRepository.findByTaxpayer(taxpayer);
     }
 
     @Override

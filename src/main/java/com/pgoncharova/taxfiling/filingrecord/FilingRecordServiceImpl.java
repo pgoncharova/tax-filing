@@ -1,6 +1,6 @@
 package com.pgoncharova.taxfiling.filingrecord;
 
-import com.pgoncharova.taxfiling.user.User;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +22,8 @@ public class FilingRecordServiceImpl implements FilingRecordService {
     }
 
     @Override
-    public List<FilingRecord> findFilingRecordsByUser(User user) {
-        return filingRecordRepository.findByUser(user);
+    public List<FilingRecord> findFilingRecordsByTaxpayer(Taxpayer taxpayer) {
+        return filingRecordRepository.findByTaxpayer(taxpayer);
     }
 
     @Override

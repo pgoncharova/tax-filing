@@ -1,7 +1,7 @@
 package com.pgoncharova.taxfiling.deduction;
 
-import com.pgoncharova.taxfiling.user.User;
-import com.pgoncharova.taxfiling.user.UserService;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
+import com.pgoncharova.taxfiling.taxpayer.TaxpayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,29 +14,29 @@ import java.util.Optional;
 public class DeductionController {
 
     private final DeductionService deductionService;
-    private final UserService userService;
+    private final TaxpayerService taxpayerService;
 
     @Autowired
-    public DeductionController(DeductionService deductionService, UserService userService) {
+    public DeductionController(DeductionService deductionService, TaxpayerService taxpayerService) {
         this.deductionService = deductionService;
-        this.userService = userService;
+        this.taxpayerService = taxpayerService;
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<Deduction> addDeduction(@PathVariable Long userId, @RequestBody Deduction deduction) {
-        Optional<User> user = userService.findById(userId);
-        if (user.isPresent()) {
-            deduction.setUser(user.get());
+    @PostMapping("/{taxpayerId}")
+    public ResponseEntity<Deduction> addDeduction(@PathVariable Long taxpayerId, @RequestBody Deduction deduction) {
+        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
+        if (taxpayer.isPresent()) {
+            deduction.setTaxpayer(taxpayer.get());
             Deduction savedDeduction = deductionService.saveDeduction(deduction);
             return ResponseEntity.ok(savedDeduction);
         }
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Deduction>> getDeductionsByUser(@PathVariable Long userId) {
-        Optional<User> user = userService.findById(userId);
-        return user.map(value -> ResponseEntity.ok(deductionService.findDeductionByUser(value)))
+    @GetMapping("/{taxpayerId}")
+    public ResponseEntity<List<Deduction>> getDeductionsByTaxpayer(@PathVariable Long taxpayerId) {
+        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
+        return taxpayer.map(value -> ResponseEntity.ok(deductionService.findDeductionByTaxpayer(value)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

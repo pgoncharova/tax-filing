@@ -1,7 +1,7 @@
 package com.pgoncharova.taxfiling.filingrecord;
 
-import com.pgoncharova.taxfiling.user.User;
-import com.pgoncharova.taxfiling.user.UserService;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
+import com.pgoncharova.taxfiling.taxpayer.TaxpayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,29 +14,29 @@ import java.util.Optional;
 public class FilingRecordController {
 
     private final FilingRecordServiceImpl filingRecordService;
-    private final UserService userService;
+    private final TaxpayerService taxpayerService;
 
     @Autowired
-    public FilingRecordController(FilingRecordServiceImpl filingRecordService, UserService userService) {
+    public FilingRecordController(FilingRecordServiceImpl filingRecordService, TaxpayerService taxpayerService) {
         this.filingRecordService = filingRecordService;
-        this.userService = userService;
+        this.taxpayerService = taxpayerService;
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<FilingRecord> addFilingRecord(@PathVariable Long userId, @RequestBody FilingRecord filingRecord) {
-        Optional<User> user = userService.findById(userId);
-        if (user.isPresent()) {
-            filingRecord.setUser(user.get());
+    @PostMapping("/{taxpayerId}")
+    public ResponseEntity<FilingRecord> addFilingRecord(@PathVariable Long taxpayerId, @RequestBody FilingRecord filingRecord) {
+        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
+        if (taxpayer.isPresent()) {
+            filingRecord.setTaxpayer(taxpayer.get());
             FilingRecord savedRecord = filingRecordService.saveFilingRecord(filingRecord);
             return ResponseEntity.ok(savedRecord);
         }
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<FilingRecord>> getFilingRecordsByUser (@PathVariable Long userId) {
-        Optional<User> user = userService.findById(userId);
-        return user.map(value -> ResponseEntity.ok(filingRecordService.findFilingRecordsByUser(value)))
+    @GetMapping("/{taxpayerId}")
+    public ResponseEntity<List<FilingRecord>> getFilingRecordsByTaxpayer (@PathVariable Long taxpayerId) {
+        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
+        return taxpayer.map(value -> ResponseEntity.ok(filingRecordService.findFilingRecordsByTaxpayer(value)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

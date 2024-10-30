@@ -1,6 +1,6 @@
 package com.pgoncharova.taxfiling.deduction;
 
-import com.pgoncharova.taxfiling.user.User;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ public interface DeductionService {
 
     Deduction saveDeduction(Deduction deduction);
 
-    List<Deduction> findDeductionByUser(User user);
+    List<Deduction> findDeductionByTaxpayer(Taxpayer taxpayer);
 
     void deleteDeduction(Long id);
 }

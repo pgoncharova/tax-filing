@@ -1,7 +1,7 @@
 package com.pgoncharova.taxfiling.income;
 
-import com.pgoncharova.taxfiling.user.User;
-import com.pgoncharova.taxfiling.user.UserService;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
+import com.pgoncharova.taxfiling.taxpayer.TaxpayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,29 +14,29 @@ import java.util.Optional;
 public class IncomeController {
 
     private final IncomeService incomeService;
-    private final UserService userService;
+    private final TaxpayerService taxpayerService;
 
     @Autowired
-    public IncomeController(IncomeService incomeService, UserService userService) {
+    public IncomeController(IncomeService incomeService, TaxpayerService taxpayerService) {
         this.incomeService = incomeService;
-        this.userService = userService;
+        this.taxpayerService = taxpayerService;
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<Income> addIncome(@PathVariable Long userId, @RequestBody Income income) {
-        Optional<User> user = userService.findById(userId);
-        if (user.isPresent()) {
-            income.setUser(user.get());
+    @PostMapping("/{taxpayerId}")
+    public ResponseEntity<Income> addIncome(@PathVariable Long taxpayerId, @RequestBody Income income) {
+        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
+        if (taxpayer.isPresent()) {
+            income.setTaxpayer(taxpayer.get());
             Income savedIncome = incomeService.saveIncome(income);
             return ResponseEntity.ok(savedIncome);
         }
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Income>> getIncomesByUser(@PathVariable Long userId) {
-        Optional<User> user = userService.findById(userId);
-        return user.map(value -> ResponseEntity.ok(incomeService.findIncomesByUser(value)))
+    @GetMapping("/{taxpayerId}")
+    public ResponseEntity<List<Income>> getIncomesByTaxpayer(@PathVariable Long taxpayerId) {
+        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
+        return taxpayer.map(value -> ResponseEntity.ok(incomeService.findIncomesByTaxpayer(value)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

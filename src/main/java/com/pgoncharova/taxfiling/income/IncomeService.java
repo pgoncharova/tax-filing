@@ -1,6 +1,6 @@
 package com.pgoncharova.taxfiling.income;
 
-import com.pgoncharova.taxfiling.user.User;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ public interface IncomeService {
 
     Income saveIncome(Income income);
 
-    List<Income> findIncomesByUser(User user);
+    List<Income> findIncomesByTaxpayer(Taxpayer taxpayer);
 
     void deleteIncome(Long id);
 }

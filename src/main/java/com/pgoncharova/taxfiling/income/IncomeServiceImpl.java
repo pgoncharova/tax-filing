@@ -1,6 +1,6 @@
 package com.pgoncharova.taxfiling.income;
 
-import com.pgoncharova.taxfiling.user.User;
+import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +22,8 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public List<Income> findIncomesByUser(User user) {
-        return incomeRepository.findByUser(user);
+    public List<Income> findIncomesByTaxpayer(Taxpayer taxpayer) {
+        return incomeRepository.findByTaxpayer(taxpayer);
     }
 
     @Override

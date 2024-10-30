@@ -1,0 +1,116 @@
+package com.pgoncharova.taxfiling.taxpayer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+@SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
+class TaxpayerControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @MockBean
+    TaxpayerService taxpayerService;
+
+    List<Taxpayer> taxpayers;
+    String baseUrl = "/api";
+
+    @BeforeEach
+    void setUp() throws Exception {
+        Taxpayer t1 = new Taxpayer();
+        t1.setId(1L);
+        t1.setUsername("testUser");
+        t1.setEmail("testuser@example.com");
+        t1.setPassword("password123");
+        t1.setRole("user");
+
+        Taxpayer t2 = new Taxpayer();
+        t2.setId(2L);
+        t2.setUsername("testUser2");
+        t2.setEmail("testuser2@example.com");
+        t2.setPassword("password456");
+        t2.setRole("user");
+
+        this.taxpayers = new ArrayList<>();
+        this.taxpayers.add(t1);
+        this.taxpayers.add(t2);
+    }
+
+    @AfterEach
+    void tearDown() {
+    }
+
+    /**
+     * Tests the behavior of a REST API (POST) endpoint for adding a new
+     * taxpayer entity. Confirms that the API returns the expected response
+     * when a taxpayer is successfully added.
+     *
+     * @throws Exception
+     */
+    @Test
+    void createTaxpayer() throws Exception {
+        // Taxpayer data sent in the POST request body
+        TaxpayerDto taxpayerDto = new TaxpayerDto(3L,
+                "testUser3",
+                "password789",
+                "testuser3@example.com",
+                "user",
+                0);
+
+        // Convert taxpayerDto to JSON string
+        String json = this.objectMapper.writeValueAsString(taxpayerDto);
+
+        // Expected data to be returned by taxpayerService
+        Taxpayer savedTaxpayer = new Taxpayer();
+        savedTaxpayer.setId(3L);
+        savedTaxpayer.setUsername("testUser3");
+        savedTaxpayer.setPassword("password789");
+        savedTaxpayer.setEmail("testuser3@example.com");
+        savedTaxpayer.setRole("user");
+
+        // Given. Mocks taxpayerService.
+        // Expects any Taxpayer object as input to the save method.
+        // Will return savedCustomer.
+        given(this.taxpayerService.saveTaxpayer(Mockito.any(Taxpayer.class)))
+                .willReturn(savedTaxpayer);
+
+        // When and then. Simulates HTTP POST request to /taxpayers endpoint.
+        this.mockMvc.perform(post(this.baseUrl + "/taxpayers")
+                .contentType(MediaType.APPLICATION_JSON)    // specifies content type JSON
+                        .content(json)                      // specifies JSON-encoded request body
+                .accept(MediaType.APPLICATION_JSON))        // expects JSON response
+                .andExpect(jsonPath("$.id").value(3L))
+                .andExpect(jsonPath("$.username").value("testUser3"))
+                .andExpect(jsonPath("$.password").value("password789"))
+                .andExpect(jsonPath("$.email").value("testuser3@example.com"));
+    }
+
+    @Test
+    void getTaxpayerByUsername() {
+    }
+
+    @Test
+    void deleteTaxpayer() {
+    }
+}
