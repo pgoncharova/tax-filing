@@ -9,6 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
@@ -147,6 +150,60 @@ class TaxpayerServiceTest {
     }
 
     @Test
+    void findByEmail() {
+        // Given.
+        Taxpayer taxpayer = new Taxpayer();
+        taxpayer.setId(1L);
+        taxpayer.setUsername("testUser");
+        taxpayer.setEmail("testuser@example.com");
+        taxpayer.setPassword("password123");
+        taxpayer.setRoles("user");
+        taxpayer.setEnabled(true);
+
+        given(this.taxpayerRepository.findByEmail("testuser@example.com"))
+                .willReturn(Optional.of(taxpayer));
+
+        // When.
+        Taxpayer returnedTaxpayer = this.taxpayerService.findByEmail("testuser@example.com");
+
+        // Then.
+        assertThat(returnedTaxpayer.getId()).isEqualTo(taxpayer.getId());
+        assertThat(returnedTaxpayer.getUsername()).isEqualTo(taxpayer.getUsername());
+        assertThat(returnedTaxpayer.getPassword()).isEqualTo(taxpayer.getPassword());
+        assertThat(returnedTaxpayer.getEmail()).isEqualTo(taxpayer.getEmail());
+        assertThat(returnedTaxpayer.getRoles()).isEqualTo(taxpayer.getRoles());
+        assertThat(returnedTaxpayer.isEnabled()).isEqualTo(taxpayer.isEnabled());
+        verify(this.taxpayerRepository, times(1)).findByEmail("testuser@example.com");
+    }
+
+    @Test
+    void findByUsername() {
+        // Given.
+        Taxpayer taxpayer = new Taxpayer();
+        taxpayer.setId(1L);
+        taxpayer.setUsername("testUser");
+        taxpayer.setEmail("testuser@example.com");
+        taxpayer.setPassword("password123");
+        taxpayer.setRoles("user");
+        taxpayer.setEnabled(true);
+
+        given(this.taxpayerRepository.findByUsername("testUser"))
+                .willReturn(Optional.of(taxpayer));
+
+        // When.
+        Taxpayer returnedTaxpayer = this.taxpayerService.findByUsername("testUser");
+
+        // Then.
+        assertThat(returnedTaxpayer.getId()).isEqualTo(taxpayer.getId());
+        assertThat(returnedTaxpayer.getUsername()).isEqualTo(taxpayer.getUsername());
+        assertThat(returnedTaxpayer.getPassword()).isEqualTo(taxpayer.getPassword());
+        assertThat(returnedTaxpayer.getEmail()).isEqualTo(taxpayer.getEmail());
+        assertThat(returnedTaxpayer.getRoles()).isEqualTo(taxpayer.getRoles());
+        assertThat(returnedTaxpayer.isEnabled()).isEqualTo(taxpayer.isEnabled());
+        verify(this.taxpayerRepository, times(1)).findByUsername("testUser");
+    }
+
+    @Test
     void updateSuccess() {
         // Given
         Taxpayer oldTaxpayer = new Taxpayer();
@@ -213,7 +270,8 @@ class TaxpayerServiceTest {
         taxpayer.setRoles("user");
         taxpayer.setEnabled(true);
 
-        given(this.taxpayerRepository.findById(1L)).willReturn(Optional.of(taxpayer));
+        given(this.taxpayerRepository.findById(1L))
+                .willReturn(Optional.of(taxpayer));
         doNothing().when(this.taxpayerRepository).deleteById(1L);
 
         // When
@@ -226,21 +284,98 @@ class TaxpayerServiceTest {
     @Test
     void deleteNotFound() {
         // Given
+        given(this.taxpayerRepository.findById(1L))
+                .willReturn(Optional.empty());
+
         // When
+        Throwable thrown = assertThrows(ObjectNotFoundException.class, () -> {
+            this.taxpayerService.delete(1L);
+        });
+
         // Then
+        assertThat(thrown)
+                .isInstanceOf(ObjectNotFoundException.class)
+                .hasMessage("Could not find taxpayer with id 1");
+        verify(this.taxpayerRepository, times(1)).findById(1L);
     }
 
     @Test
-    void loadUserByUsername() {
+    void loadUserByUsernameSuccess() {
         // Given
+        Taxpayer taxpayer = new Taxpayer();
+        taxpayer.setUsername("testUser");
+        taxpayer.setEmail("testuser@example.com");
+        taxpayer.setPassword("password123");
+        taxpayer.setRoles("user");
+        taxpayer.setEnabled(true);
+
+        given(this.taxpayerRepository.findByUsername("testUser"))
+                .willReturn(Optional.of(taxpayer));
+
         // When
+        TaxpayerPrincipal taxpayerPrincipal = this.taxpayerService.loadUserByUsername("testUser");
+
         // Then
+        assertThat(taxpayerPrincipal.getUsername()).isEqualTo("testUser");
+        assertThat(taxpayerPrincipal.getPassword()).isEqualTo("password123");
+        assertThat(taxpayerPrincipal.hasAuthority("user")).isEqualTo(true);
     }
 
     @Test
-    void loadUserByEmail() {
+    void loadUserByUsernameNotFound() {
         // Given
+        given(this.taxpayerRepository.findByUsername("testUser"))
+                .willReturn(Optional.empty());
+
         // When
+        Throwable thrown = assertThrows(UsernameNotFoundException.class, () -> {
+            this.taxpayerService.loadUserByUsername("testUser");
+        });
+
         // Then
+        assertThat(thrown)
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("username testUser is not found.");
+        verify(this.taxpayerRepository, times(1)).findByUsername("testUser");
+    }
+
+    @Test
+    void loadUserByEmailSuccess() {
+        // Given
+        Taxpayer taxpayer = new Taxpayer();
+        taxpayer.setUsername("testUser");
+        taxpayer.setEmail("testuser@example.com");
+        taxpayer.setPassword("password123");
+        taxpayer.setRoles("user");
+        taxpayer.setEnabled(true);
+
+        given(this.taxpayerRepository.findByEmail("testuser@example.com"))
+                .willReturn(Optional.of(taxpayer));
+
+        // When
+        TaxpayerPrincipal taxpayerPrincipal = this.taxpayerService.loadUserByEmail("testuser@example.com");
+
+        // Then
+        assertThat(taxpayerPrincipal.getUsername()).isEqualTo("testUser");
+        assertThat(taxpayerPrincipal.getPassword()).isEqualTo("password123");
+        assertThat(taxpayerPrincipal.hasAuthority("user")).isEqualTo(true);
+    }
+
+    @Test
+    void loadUserByEmailNotFound() {
+        // Given
+        given(this.taxpayerRepository.findByEmail("testuser@example.com"))
+                .willReturn(Optional.empty());
+
+        // When
+        Throwable thrown = assertThrows(UsernameNotFoundException.class, () -> {
+            this.taxpayerService.loadUserByEmail("testuser@example.com");
+        });
+
+        // Then
+        assertThat(thrown)
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("email testuser@example.com is not found.");
+        verify(this.taxpayerRepository, times(1)).findByEmail("testuser@example.com");
     }
 }

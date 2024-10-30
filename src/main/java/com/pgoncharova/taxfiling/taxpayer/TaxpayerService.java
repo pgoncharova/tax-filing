@@ -38,6 +38,16 @@ public class TaxpayerService implements UserDetailsService {
                 .orElseThrow(() -> new ObjectNotFoundException("taxpayer", taxpayerId));
     }
 
+    public Taxpayer findByEmail(String email) {
+        return this.taxpayerRepository.findByEmail(email)
+                .orElseThrow(() -> new ObjectNotFoundException("taxpayer", email));
+    }
+
+    public Taxpayer findByUsername(String username) {
+        return this.taxpayerRepository.findByUsername(username)
+                .orElseThrow(() -> new ObjectNotFoundException("taxpayer", username));
+    }
+
     public Taxpayer update(Long taxpayerId, Taxpayer update) {
         Taxpayer oldTaxpayer = this.taxpayerRepository.findById(taxpayerId)
                 .orElseThrow(() -> new ObjectNotFoundException("taxpayer", taxpayerId));
@@ -55,13 +65,13 @@ public class TaxpayerService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public TaxpayerPrincipal loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.taxpayerRepository.findByUsername(username)
                 .map(taxpayer -> new TaxpayerPrincipal(taxpayer))
                 .orElseThrow(() -> new UsernameNotFoundException("username " + username + " is not found."));
     }
 
-    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+    public TaxpayerPrincipal loadUserByEmail(String email) throws UsernameNotFoundException {
         return this.taxpayerRepository.findByEmail(email)
                 .map(taxpayer -> new TaxpayerPrincipal(taxpayer))
                 .orElseThrow(() -> new UsernameNotFoundException("email " + email + " is not found."));

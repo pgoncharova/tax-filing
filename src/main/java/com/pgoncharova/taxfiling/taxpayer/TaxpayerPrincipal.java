@@ -33,6 +33,15 @@ public class TaxpayerPrincipal implements UserDetails {
                 .toList();
     }
 
+    public boolean hasAuthority(String role) {
+        for (GrantedAuthority authority : this.getAuthorities()) {
+            if (authority.getAuthority().equals("ROLE_" + role)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String getPassword() {
         return this.taxpayer.getPassword();
