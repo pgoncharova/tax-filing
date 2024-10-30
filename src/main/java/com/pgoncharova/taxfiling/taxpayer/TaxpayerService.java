@@ -1,7 +1,7 @@
 package com.pgoncharova.taxfiling.taxpayer;
 
+import com.pgoncharova.taxfiling.system.exception.ObjectNotFoundException;
 import jakarta.transaction.Transactional;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,12 +35,12 @@ public class TaxpayerService implements UserDetailsService {
 
     public Taxpayer findById(Long taxpayerId) {
         return this.taxpayerRepository.findById(taxpayerId)
-                .orElseThrow(() -> new ObjectNotFoundException("user", taxpayerId));
+                .orElseThrow(() -> new ObjectNotFoundException("taxpayer", taxpayerId));
     }
 
     public Taxpayer update(Long taxpayerId, Taxpayer update) {
         Taxpayer oldTaxpayer = this.taxpayerRepository.findById(taxpayerId)
-                .orElseThrow(() -> new ObjectNotFoundException("user", taxpayerId));
+                .orElseThrow(() -> new ObjectNotFoundException("taxpayer", taxpayerId));
         oldTaxpayer.setUsername(update.getUsername());
         oldTaxpayer.setEmail(update.getEmail());
         oldTaxpayer.setRoles(update.getRoles());
@@ -50,7 +50,7 @@ public class TaxpayerService implements UserDetailsService {
 
     public void delete(Long taxpayerId) {
         this.taxpayerRepository.findById(taxpayerId)
-                .orElseThrow(() -> new ObjectNotFoundException("user", taxpayerId));
+                .orElseThrow(() -> new ObjectNotFoundException("taxpayer", taxpayerId));
         this.taxpayerRepository.deleteById(taxpayerId);
     }
 

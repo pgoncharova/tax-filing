@@ -43,6 +43,7 @@ class TaxpayerControllerTest {
         t1.setEmail("testuser@example.com");
         t1.setPassword("password123");
         t1.setRoles("user");
+        t1.setEnabled(true);
 
         Taxpayer t2 = new Taxpayer();
         t2.setId(2L);
@@ -50,6 +51,7 @@ class TaxpayerControllerTest {
         t2.setEmail("testuser2@example.com");
         t2.setPassword("password456");
         t2.setRoles("user");
+        t2.setEnabled(true);
 
         this.taxpayers = new ArrayList<>();
         this.taxpayers.add(t1);
