@@ -1,6 +1,9 @@
 package com.pgoncharova.taxfiling.taxpayer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pgoncharova.taxfiling.system.StatusCode;
+import com.pgoncharova.taxfiling.system.exception.ObjectNotFoundException;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,11 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -44,6 +49,8 @@ class TaxpayerControllerTest {
         t1.setPassword("password123");
         t1.setRoles("user");
         t1.setEnabled(true);
+        t1.setSsn("123-45-6789");
+        t1.setLastName("Doe");
 
         Taxpayer t2 = new Taxpayer();
         t2.setId(2L);
@@ -52,6 +59,8 @@ class TaxpayerControllerTest {
         t2.setPassword("password456");
         t2.setRoles("user");
         t2.setEnabled(true);
+        t2.setSsn("987-65-4321");
+        t2.setLastName("Doe");
 
         this.taxpayers = new ArrayList<>();
         this.taxpayers.add(t1);
@@ -70,7 +79,7 @@ class TaxpayerControllerTest {
      * @throws Exception
      */
     @Test
-    void createTaxpayer() throws Exception {
+    void addTaxpayer() throws Exception {
         // Taxpayer data sent in the POST request body
         TaxpayerDto taxpayerDto = new TaxpayerDto(3L,
                 "testUser3",
@@ -101,6 +110,9 @@ class TaxpayerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)    // specifies content type JSON
                         .content(json)                      // specifies JSON-encoded request body
                 .accept(MediaType.APPLICATION_JSON))        // expects JSON response
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Add Success"))
                 .andExpect(jsonPath("$.data.id").value(3L))
                 .andExpect(jsonPath("$.data.username").value("testUser3"))
                 .andExpect(jsonPath("$.data.password").value("password789"))
@@ -108,7 +120,68 @@ class TaxpayerControllerTest {
     }
 
     @Test
-    void getTaxpayerByUsername() {
+    void findAllTaxpayers() throws Exception {
+        // Given
+        given(this.taxpayerService.findAll()).willReturn(this.taxpayers);
+
+        // When and then
+        this.mockMvc.perform(get("/taxpayers").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Find All Success"))
+                .andExpect(jsonPath("$.data", Matchers.hasSize(this.taxpayers.size())))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
+                .andExpect(jsonPath("$.data[0].username").value("testUser"))
+                .andExpect(jsonPath("$.data[1].id").value(2L))
+                .andExpect(jsonPath("$.data[1].username").value("testUser2"));
+    }
+
+    @Test
+    void searchTaxpayers() throws Exception {
+        // Given
+        given(this.taxpayerService.findByFilters("123-45-6789", null))
+                .willReturn(Arrays.asList(this.taxpayers.get(0)));
+
+        // When and then
+        this.mockMvc.perform(get("/taxpayers/search").accept(MediaType.APPLICATION_JSON)
+                .param("ssn", "123-45-6789"))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Search Success"))
+                .andExpect(jsonPath("$.data", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id").value(1L))
+                .andExpect(jsonPath("$.data[0].username").value("testUser"));
+    }
+
+    @Test
+    void findTaxpayerByIdSuccess() throws Exception {
+        // Given
+        given(this.taxpayerService.findById(2L)).willReturn(this.taxpayers.get(1));
+
+        // When and then
+        this.mockMvc.perform(get("/taxpayers/2").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Find One Success"))
+                .andExpect(jsonPath("$.data.id").value(2L))
+                .andExpect(jsonPath("$.data.username").value("testUser2"));
+    }
+
+    @Test
+    void findTaxpayerByIdNotFound() throws Exception {
+        // Given
+        given(this.taxpayerService.findById(5L)).willThrow(new ObjectNotFoundException("taxpayer", 5L));
+
+        // When and then
+        this.mockMvc.perform(get("/taxpayers/5").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find taxpayer with id 5"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void updateTaxpayer() {
     }
 
     @Test
