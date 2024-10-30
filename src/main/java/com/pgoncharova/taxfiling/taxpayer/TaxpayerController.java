@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/taxpayers")
+@RequestMapping("/taxpayers")
 public class TaxpayerController {
 
     private final TaxpayerService taxpayerService;

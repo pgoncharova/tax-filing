@@ -13,7 +13,7 @@ public class TaxpayerDtoToTaxpayerConverter implements Converter<TaxpayerDto, Ta
         taxpayer.setUsername(source.username());
         taxpayer.setPassword(source.password());
         taxpayer.setEmail(source.email());
-        taxpayer.setRole(source.role());
+        taxpayer.setRoles(source.role());
         return taxpayer;
     }
 }

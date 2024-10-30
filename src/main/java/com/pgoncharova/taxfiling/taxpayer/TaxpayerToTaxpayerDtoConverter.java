@@ -10,7 +10,7 @@ public class TaxpayerToTaxpayerDtoConverter implements Converter<Taxpayer, Taxpa
     public TaxpayerDto convert(Taxpayer source) {
         TaxpayerDto taxpayerDto = new TaxpayerDto(source.getId(),
                 source.getUsername(), source.getPassword(),
-                source.getEmail(), source.getRole(),
+                source.getEmail(), source.getRoles(),
                 source.getNumberOfFilingRecords());
         return taxpayerDto;
     }

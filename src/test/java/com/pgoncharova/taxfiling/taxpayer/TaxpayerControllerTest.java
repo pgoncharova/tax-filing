@@ -34,7 +34,6 @@ class TaxpayerControllerTest {
     TaxpayerService taxpayerService;
 
     List<Taxpayer> taxpayers;
-    String baseUrl = "/api";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -43,14 +42,14 @@ class TaxpayerControllerTest {
         t1.setUsername("testUser");
         t1.setEmail("testuser@example.com");
         t1.setPassword("password123");
-        t1.setRole("user");
+        t1.setRoles("user");
 
         Taxpayer t2 = new Taxpayer();
         t2.setId(2L);
         t2.setUsername("testUser2");
         t2.setEmail("testuser2@example.com");
         t2.setPassword("password456");
-        t2.setRole("user");
+        t2.setRoles("user");
 
         this.taxpayers = new ArrayList<>();
         this.taxpayers.add(t1);
@@ -87,7 +86,7 @@ class TaxpayerControllerTest {
         savedTaxpayer.setUsername("testUser3");
         savedTaxpayer.setPassword("password789");
         savedTaxpayer.setEmail("testuser3@example.com");
-        savedTaxpayer.setRole("user");
+        savedTaxpayer.setRoles("user");
 
         // Given. Mocks taxpayerService.
         // Expects any Taxpayer object as input to the save method.
@@ -96,7 +95,7 @@ class TaxpayerControllerTest {
                 .willReturn(savedTaxpayer);
 
         // When and then. Simulates HTTP POST request to /taxpayers endpoint.
-        this.mockMvc.perform(post(this.baseUrl + "/taxpayers")
+        this.mockMvc.perform(post("/taxpayers")
                 .contentType(MediaType.APPLICATION_JSON)    // specifies content type JSON
                         .content(json)                      // specifies JSON-encoded request body
                 .accept(MediaType.APPLICATION_JSON))        // expects JSON response
