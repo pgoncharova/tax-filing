@@ -26,6 +26,10 @@ public class Taxpayer implements Serializable {
     private String roles; // Could be "user" or "admin"
     private boolean enabled;
 
+    private String ssn;
+    private String firstName;
+    private String lastName;
+
     @OneToMany(mappedBy = "taxpayer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FilingRecord> filingRecords = new ArrayList<>();
 

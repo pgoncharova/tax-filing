@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,6 +104,39 @@ class TaxpayerServiceTest {
         // Then.
         assertThat(actualTaxpayers.size()).isEqualTo(this.taxpayers.size());
         verify(this.taxpayerRepository, times(1)).findAll();
+    }
+
+    @Test
+    void findByFilters() {
+        Taxpayer t1 = new Taxpayer();
+        t1.setId(1L);
+        t1.setUsername("testUser");
+        t1.setEmail("testuser@example.com");
+        t1.setPassword("password123");
+        t1.setRoles("user");
+        t1.setEnabled(true);
+        t1.setSsn("123-45-6789");
+        t1.setLastName("Doe");
+
+        Taxpayer t2 = new Taxpayer();
+        t2.setId(2L);
+        t2.setUsername("testUser2");
+        t2.setEmail("testuser2@example.com");
+        t2.setPassword("password456");
+        t2.setRoles("user");
+        t2.setEnabled(true);
+        t2.setSsn("987-65-4321");
+        t2.setLastName("Doe");
+
+        when(this.taxpayerRepository.findByFilters("123-45-6789", null))
+                .thenReturn(Arrays.asList(t1));
+
+        List<Taxpayer> result = this.taxpayerService.findByFilters("123-45-6789", null);
+        
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Doe", result.get(0).getLastName());
+        assertEquals("password123", result.get(0).getPassword());
     }
 
     @Test

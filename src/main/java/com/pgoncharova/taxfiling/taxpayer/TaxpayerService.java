@@ -33,6 +33,10 @@ public class TaxpayerService implements UserDetailsService {
         return this.taxpayerRepository.findAll();
     }
 
+    public List<Taxpayer> findByFilters(String ssn, String lastName) {
+        return this.taxpayerRepository.findByFilters(ssn, lastName);
+    }
+
     public Taxpayer findById(Long taxpayerId) {
         return this.taxpayerRepository.findById(taxpayerId)
                 .orElseThrow(() -> new ObjectNotFoundException("taxpayer", taxpayerId));

@@ -48,6 +48,18 @@ public class TaxpayerController {
         return new Result(true, StatusCode.SUCCESS, "Find All Success", taxpayerDtos);
     }
 
+    @GetMapping("/search")
+    public Result searchTaxpayers(@RequestParam(required = false) String ssn,
+                                  @RequestParam(required = false) String lastName) {
+        List<Taxpayer> foundTaxpayers = this.taxpayerService.findByFilters(ssn, lastName);
+
+        List<TaxpayerDto> taxpayerDtos = foundTaxpayers.stream()
+                .map(taxpayerToTaxpayerDtoConverter::convert)
+                .collect(Collectors.toList());
+
+        return new Result(true, StatusCode.SUCCESS, "Search Success", taxpayerDtos);
+    }
+
     @GetMapping("/{taxpayerId}")
     public Result findTaxpayerById(@PathVariable Long taxpayerId) {
         Taxpayer foundTaxpayer = this.taxpayerService.findById(taxpayerId);
