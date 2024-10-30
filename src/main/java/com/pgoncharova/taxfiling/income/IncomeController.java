@@ -24,20 +24,14 @@ public class IncomeController {
 
     @PostMapping("/{taxpayerId}")
     public ResponseEntity<Income> addIncome(@PathVariable Long taxpayerId, @RequestBody Income income) {
-        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
-        if (taxpayer.isPresent()) {
-            income.setTaxpayer(taxpayer.get());
-            Income savedIncome = incomeService.saveIncome(income);
-            return ResponseEntity.ok(savedIncome);
-        }
+
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{taxpayerId}")
     public ResponseEntity<List<Income>> getIncomesByTaxpayer(@PathVariable Long taxpayerId) {
-        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
-        return taxpayer.map(value -> ResponseEntity.ok(incomeService.findIncomesByTaxpayer(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")

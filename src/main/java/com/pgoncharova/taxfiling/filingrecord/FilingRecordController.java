@@ -24,20 +24,14 @@ public class FilingRecordController {
 
     @PostMapping("/{taxpayerId}")
     public ResponseEntity<FilingRecord> addFilingRecord(@PathVariable Long taxpayerId, @RequestBody FilingRecord filingRecord) {
-        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
-        if (taxpayer.isPresent()) {
-            filingRecord.setTaxpayer(taxpayer.get());
-            FilingRecord savedRecord = filingRecordService.saveFilingRecord(filingRecord);
-            return ResponseEntity.ok(savedRecord);
-        }
+
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{taxpayerId}")
     public ResponseEntity<List<FilingRecord>> getFilingRecordsByTaxpayer (@PathVariable Long taxpayerId) {
-        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
-        return taxpayer.map(value -> ResponseEntity.ok(filingRecordService.findFilingRecordsByTaxpayer(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")

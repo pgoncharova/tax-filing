@@ -36,7 +36,7 @@ class TaxpayerControllerTest {
     List<Taxpayer> taxpayers;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         Taxpayer t1 = new Taxpayer();
         t1.setId(1L);
         t1.setUsername("testUser");
@@ -91,7 +91,7 @@ class TaxpayerControllerTest {
         // Given. Mocks taxpayerService.
         // Expects any Taxpayer object as input to the save method.
         // Will return savedCustomer.
-        given(this.taxpayerService.saveTaxpayer(Mockito.any(Taxpayer.class)))
+        given(this.taxpayerService.save(Mockito.any(Taxpayer.class)))
                 .willReturn(savedTaxpayer);
 
         // When and then. Simulates HTTP POST request to /taxpayers endpoint.
@@ -99,10 +99,10 @@ class TaxpayerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)    // specifies content type JSON
                         .content(json)                      // specifies JSON-encoded request body
                 .accept(MediaType.APPLICATION_JSON))        // expects JSON response
-                .andExpect(jsonPath("$.id").value(3L))
-                .andExpect(jsonPath("$.username").value("testUser3"))
-                .andExpect(jsonPath("$.password").value("password789"))
-                .andExpect(jsonPath("$.email").value("testuser3@example.com"));
+                .andExpect(jsonPath("$.data.id").value(3L))
+                .andExpect(jsonPath("$.data.username").value("testUser3"))
+                .andExpect(jsonPath("$.data.password").value("password789"))
+                .andExpect(jsonPath("$.data.email").value("testuser3@example.com"));
     }
 
     @Test

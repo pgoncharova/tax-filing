@@ -24,20 +24,14 @@ public class DeductionController {
 
     @PostMapping("/{taxpayerId}")
     public ResponseEntity<Deduction> addDeduction(@PathVariable Long taxpayerId, @RequestBody Deduction deduction) {
-        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
-        if (taxpayer.isPresent()) {
-            deduction.setTaxpayer(taxpayer.get());
-            Deduction savedDeduction = deductionService.saveDeduction(deduction);
-            return ResponseEntity.ok(savedDeduction);
-        }
+
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{taxpayerId}")
     public ResponseEntity<List<Deduction>> getDeductionsByTaxpayer(@PathVariable Long taxpayerId) {
-        Optional<Taxpayer> taxpayer = taxpayerService.findById(taxpayerId);
-        return taxpayer.map(value -> ResponseEntity.ok(deductionService.findDeductionByTaxpayer(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
