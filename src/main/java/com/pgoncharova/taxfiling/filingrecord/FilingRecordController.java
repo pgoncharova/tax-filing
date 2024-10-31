@@ -13,11 +13,11 @@ import java.util.Optional;
 @RequestMapping("/api/filings")
 public class FilingRecordController {
 
-    private final FilingRecordServiceImpl filingRecordService;
+    private final FilingRecordService filingRecordService;
     private final TaxpayerService taxpayerService;
 
     @Autowired
-    public FilingRecordController(FilingRecordServiceImpl filingRecordService, TaxpayerService taxpayerService) {
+    public FilingRecordController(FilingRecordService filingRecordService, TaxpayerService taxpayerService) {
         this.filingRecordService = filingRecordService;
         this.taxpayerService = taxpayerService;
     }
@@ -36,7 +36,7 @@ public class FilingRecordController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilingRecord(@PathVariable Long id) {
-        filingRecordService.deleteFilingRecord(id);
+        filingRecordService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
