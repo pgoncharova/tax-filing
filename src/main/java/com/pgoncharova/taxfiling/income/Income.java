@@ -1,5 +1,6 @@
 package com.pgoncharova.taxfiling.income;
 
+import com.pgoncharova.taxfiling.filingrecord.FilingRecord;
 import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,6 +20,6 @@ public class Income {
     private Double taxWithheld;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Taxpayer taxpayer;
+    @JoinColumn(name = "filing_record_id")
+    private FilingRecord filingRecord;
 }

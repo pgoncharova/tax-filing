@@ -1,5 +1,6 @@
 package com.pgoncharova.taxfiling.deduction;
 
+import com.pgoncharova.taxfiling.filingrecord.FilingRecord;
 import com.pgoncharova.taxfiling.taxpayer.Taxpayer;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -18,6 +19,6 @@ public class Deduction {
     private Double amount;
 
     @ManyToOne
-    @JoinColumn(name = "taxpayer_id")
-    private Taxpayer taxpayer;
+    @JoinColumn(name = "filing_record_id")
+    private FilingRecord filingRecord;
 }
