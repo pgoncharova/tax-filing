@@ -1,5 +1,6 @@
 package com.pgoncharova.taxfiling.taxpayer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pgoncharova.taxfiling.system.StatusCode;
 import com.pgoncharova.taxfiling.system.exception.ObjectNotFoundException;
@@ -20,8 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -181,10 +183,79 @@ class TaxpayerControllerTest {
     }
 
     @Test
-    void updateTaxpayer() {
+    void updateTaxpayerSuccess() throws Exception {
+        // Given
+        TaxpayerDto taxpayerDto = new TaxpayerDto(3L, "testUser3",
+                "password789", "testuser3@example.com",
+                "user", 0);
+
+        Taxpayer updatedTaxpayer = new Taxpayer();
+        updatedTaxpayer.setId(3L);
+        updatedTaxpayer.setUsername("testUser3 - update");
+        updatedTaxpayer.setPassword("password789");
+        updatedTaxpayer.setEmail("testuser3@example.com");
+        updatedTaxpayer.setRoles("user");
+
+        String json = this.objectMapper.writeValueAsString(taxpayerDto);
+
+        given(this.taxpayerService.update(eq(3L), Mockito.any(Taxpayer.class)))
+                .willReturn(updatedTaxpayer);
+
+        // When and then
+        this.mockMvc.perform(put("/taxpayers/3").contentType(MediaType.APPLICATION_JSON)
+                .content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Update Success"))
+                .andExpect(jsonPath("$.data.id").value(3L))
+                .andExpect(jsonPath("$.data.username").value("testUser3 - update"))
+                .andExpect(jsonPath("$.data.password").value("password789"))
+                .andExpect(jsonPath("$.data.email").value("testuser3@example.com"));
     }
 
     @Test
-    void deleteTaxpayer() {
+    void updateTaxpayerNotFound() throws Exception {
+        // Given
+        given(this.taxpayerService.update(eq(5L), Mockito.any(Taxpayer.class)))
+                .willThrow(new ObjectNotFoundException("taxpayer", 5L));
+
+        TaxpayerDto taxpayerDto = new TaxpayerDto(5L, "testUser5",
+                "password456", "testuser5@example.com",
+                "user", 0);
+
+        String json = this.objectMapper.writeValueAsString(taxpayerDto);
+
+        // When and then
+        this.mockMvc.perform(put("/taxpayers/5").contentType(MediaType.APPLICATION_JSON)
+                .content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find taxpayer with id 5"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void deleteTaxpayerSuccess() throws Exception {
+        // Given
+        doNothing().when(this.taxpayerService).delete(2L);
+
+        // When and then
+        this.mockMvc.perform(delete("/taxpayers/2").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Delete Success"));
+    }
+
+    @Test
+    void deleteTaxpayerNotFound() throws Exception {
+        // Given
+        doThrow(new ObjectNotFoundException("taxpayer", 5L)).when(this.taxpayerService).delete(5L);
+
+        // When and then
+        this.mockMvc.perform(delete("/taxpayers/5").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find taxpayer with id 5"))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 }
