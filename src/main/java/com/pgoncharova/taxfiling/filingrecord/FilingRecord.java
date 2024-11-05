@@ -2,6 +2,7 @@ package com.pgoncharova.taxfiling.filingrecord;
 
 import com.pgoncharova.taxfiling.deduction.Deduction;
 import com.pgoncharova.taxfiling.filingrecord.address.Address;
+import com.pgoncharova.taxfiling.filingrecord.dependent.Dependent;
 import com.pgoncharova.taxfiling.filingrecord.filingstatus.FilingStatus;
 import com.pgoncharova.taxfiling.filingrecord.standarddeduction.StandardDeduction;
 import com.pgoncharova.taxfiling.income.Income;
@@ -36,6 +37,7 @@ public class FilingRecord implements Serializable {
     private Address address;
     private boolean hasDigitalAssets;
     private StandardDeduction standardDeduction;
+    private List<Dependent> dependents;
 
     private Double totalIncome;
     private Double totalDeductions;
